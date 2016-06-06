@@ -52,19 +52,22 @@ import org.junit.runner.Result;
 public class RunListener {
 
     /**
-     * Called before any tests have been run. This may be called on an
-     * arbitrary thread.
+     * Called before any tests 
+     * of a suite described by <code>description</code> have been run. 
+     * This may be called on an arbitrary thread.
      *
-     * @param description describes the tests to be run
+     * @param description describes the suite of tests to be run
      */
     public void testRunStarted(Description description) throws Exception {
     }
 
     /**
-     * Called when all tests have finished. This may be called on an
-     * arbitrary thread.
+     * Called when all tests of the suite 
+     * announced by {@link #testRunStarted(Description)} have finished. 
+     * This may be called on an arbitrary thread.
      *
-     * @param result the summary of the test run, including all the tests that failed
+     * @param result the summary of the of the outcoming of the suite of tests run, 
+     * including all the tests that failed
      */
     public void testRunFinished(Result result) throws Exception {
     }
@@ -89,7 +92,7 @@ public class RunListener {
     /**
      * Called when a test suite has finished, whether the test suite succeeds or fails.
      * This method will not be called for a given {@link Description} unless
-     * {@link #testSuiteStarted(Description)} was called for the same @code Description}.
+     * {@link #testSuiteStarted(Description)} was called for the same {@code Description}.
      *
      * @param description the description of the test suite that just ran
      * @since 4.13
@@ -99,51 +102,84 @@ public class RunListener {
 
     /**
      * Called when an atomic test is about to be started.
+     * An ignored test is never started. 
      *
      * @param description the description of the test that is about to be run
      * (generally a class and method name)
+     * @see #testIgnored(Description)
      */
     public void testStarted(Description description) throws Exception {
     }
 
     /**
-     * Called when an atomic test has finished, whether the test succeeds or fails.
+     * Called when an atomic test has finished, whether the test succeeds or fails.   
+     * This method must be invoked after a test has been started 
+     * which was indicated by {@link #testStarted(Description)} before. 
+     * An ignored test is never finished. 
      *
      * @param description the description of the test that just ran
+     * @see #testIgnored(Description)
      */
     public void testFinished(Description description) throws Exception {
     }
 
     /**
-     * Called when an atomic test fails, or when a listener throws an exception.
+     * Called when an atomic test fails to execute properly 
+     * throwing a Throwable, or when a listener throws an exception. 
+     * <p>
+     * In the case of a failure of an atomic test, 
+     * this method is invoked after {@link #testStarted(Description)} 
+     * and before {@link #testFinished(Description)}
+     * with the according description of <code>failure</code> 
+     * from the same thread that called {@link #testStarted(Description)}. 
+     * In case of a failed assumption, instead of this method 
+     * {@link #testAssumptionFailure(Failure)} is invoked 
+     * for the according test. 
+     * <p>
+     * In the case of a listener throwing an exception, 
+     * this method will be called with the description of <code>failure</code> 
+     * given by {@link Description#TEST_MECHANISM}, 
+     * and may be called on an arbitrary thread.
      *
-     * <p>In the case of a failure of an atomic test, this method will be called
-     * with the same {@code Description} passed to
-     * {@link #testStarted(Description)}, from the same thread that called
-     * {@link #testStarted(Description)}.
-     *
-     * <p>In the case of a listener throwing an exception, this will be called with
-     * a {@code Description} of {@link Description#TEST_MECHANISM}, and may be called
-     * on an arbitrary thread.
-     *
-     * @param failure describes the test that failed and the exception that was thrown
+     * @param failure 
+     *    describes the test that failed and the exception that was thrown 
+     *    or indicates that a listener has thrown an exception 
+     *    and the according exception. 
      */
     public void testFailure(Failure failure) throws Exception {
     }
 
     /**
-     * Called when an atomic test flags that it assumes a condition that is
-     * false
+     * Called when an atomic test flags 
+     * that it assumes a condition that is false. 
+     * This is treated as ignored with the description of the failure. 
+     * This method is invoked after {@link #testStarted(Description)} 
+     * and before {@link #testFinished(Description)}
+     * with the according description of <code>failure</code>. 
+     * A failed assertion does not count as a failure 
+     * and so {@link #testFailure(Failure)} is not invoked 
+     * for the according test. 
+     * <p>
+     * CAUTION: Although a failed assertion is like an ignored test, 
+     * {@link #testRunFinished(Result)} does not count this as ignored test 
+     * but rather than a passed test. 
      *
-     * @param failure describes the test that failed and the
-     * {@link org.junit.AssumptionViolatedException} that was thrown
+     * @param failure
+     *    describes the test that failed 
+     *    and the {@link AssumptionViolatedException} that was thrown. 
+     * @see #testIgnored(Description)
      */
     public void testAssumptionFailure(Failure failure) {
     }
 
     /**
      * Called when a test will not be run, generally because a test method is annotated
-     * with {@link org.junit.Ignore}.
+     * with {@link org.junit.Ignore}. 
+     * This implies that neither {@link #testStarted(Description)} 
+     * nor {@link #testFinished(Description)} are invoked 
+     * for the according test. 
+     * This in turn implies that neither {@link #testFailure(Failure)} 
+     * nor {@link #testAssumptionFailure(Failure)} are invoked. 
      *
      * @param description describes the test that will not be run
      */
