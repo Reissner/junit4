@@ -17,7 +17,8 @@ import org.junit.runner.notification.Failure;
 import org.junit.runner.notification.RunListener;
 
 /**
- * A <code>Result</code> collects and summarizes information from running multiple tests.
+ * A <code>Result</code> collects and summarizes information from running multiple tests. 
+ * A {@link RunListener} is notified on the result by invoking {@link RunListener#testRunFinished(Result)}. 
  * All tests are counted -- additional information is collected from tests that fail.
  *
  * @since 4.0
@@ -26,10 +27,33 @@ public class Result implements Serializable {
     private static final long serialVersionUID = 1L;
     private static final ObjectStreamField[] serialPersistentFields =
             ObjectStreamClass.lookup(SerializedForm.class).getFields();
+            
+    /**
+     * The number of tests run so far, whether passed, failed or about to run. 
+     * This does not include ignored tests but those with failed assumtions. 
+     */
     private final AtomicInteger count;
+    
+    /**
+     * The number of tests that failed during the run. 
+     * This includes neither the ignored tests nor those with failed assumption. 
+     */
     private final AtomicInteger ignoreCount;
+    
+    /**
+     * The list of failures collected so far. 
+     */
     private final CopyOnWriteArrayList<Failure> failures;
+    
+    /**
+     * The number of milliseconds it took to run the entire suite to run, 
+     * i.e. the time from invoking {@link RunListener#testRunStarted(Description)} 
+     * to invoking {@link RunListener#testRunFinished(Description)}. 
+     */
     private final AtomicLong runTime;
+    
+    /**
+     * The time when starting the test suite as returned by {@link System#currentTimeMillis()}. 
     private final AtomicLong startTime;
 
     /** Only set during deserialization process. */
@@ -52,6 +76,11 @@ public class Result implements Serializable {
     }
 
     /**
+     * Returns the number of tests run so far, whether passed, failed or about to run. 
+     * This does not include ignored tests but those with failed assumtions. 
+     * This is the number of invocations of {@link RunListener#testFinished(Description)} 
+     * and hence of {@link RunListener#testStarted(Description)}. 
+     *
      * @return the number of tests run
      */
     public int getRunCount() {
@@ -59,6 +88,11 @@ public class Result implements Serializable {
     }
 
     /**
+     * Returns the number of tests that failed during the run. 
+     * This includes neither the ignored tests nor those with failed assumptions, 
+     * although the latter are notified through {@link RunListener#testAssumptionFailure(Failure)}. 
+     * This is the number of invocations of {@link RunListener#testFailed(Failure)}. 
+     *
      * @return the number of tests that failed during the run
      */
     public int getFailureCount() {
@@ -66,6 +100,10 @@ public class Result implements Serializable {
     }
 
     /**
+     * Returns the number of milliseconds it took to run the entire suite to run, 
+     * i.e. the time from invoking {@link RunListener#testRunStarted(Description)} 
+     * to invoking {@link RunListener#testRunFinished(Description)}. 
+     * 
      * @return the number of milliseconds it took to run the entire suite to run
      */
     public long getRunTime() {
@@ -73,6 +111,10 @@ public class Result implements Serializable {
     }
 
     /**
+     * Returns the list of failures collected. 
+     * Neither ignored tests nor tests with failed assumptions count as failures. 
+     * Failures are added by invoking {@link RunListener#testFailure(Failure)}. 
+     * 
      * @return the {@link Failure}s describing tests that failed and the problems they encountered
      */
     public List<Failure> getFailures() {
@@ -80,6 +122,9 @@ public class Result implements Serializable {
     }
 
     /**
+     * Returns the number of tests ignored during the run. 
+     * This does not include the tests with failed assumption. 
+     * 
      * @return the number of tests ignored during the run
      */
     public int getIgnoreCount() {
@@ -87,6 +132,9 @@ public class Result implements Serializable {
     }
 
     /**
+     * Returns whether the whole test succeeded, 
+     * i.e. whether no failure occurred according to {@link #failures}. 
+     * 
      * @return <code>true</code> if all tests succeeded
      */
     public boolean wasSuccessful() {
