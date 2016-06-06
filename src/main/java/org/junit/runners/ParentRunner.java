@@ -45,10 +45,12 @@ import org.junit.validator.TestClassValidator;
 /**
  * Provides most of the functionality specific to a Runner that implements a
  * "parent node" in the test tree, with children defined by objects of some data
- * type {@code T}. (For {@link BlockJUnit4ClassRunner}, {@code T} is
- * {@link Method} . For {@link Suite}, {@code T} is {@link Class}.) Subclasses
- * must implement finding the children of the node, describing each child, and
- * running each child. ParentRunner will filter and sort children, handle
+ * type {@code T}. 
+ * (For {@link BlockJUnit4ClassRunner}, {@code T} is {@link FrameworkMethod}.
+ * For {@link Suite}, {@code T} is {@link Runner}.) 
+ * Subclasses must implement finding the children of the node, 
+ * describing each child, and running each child. 
+ * ParentRunner will filter and sort children, handle
  * {@code @BeforeClass} and {@code @AfterClass} methods,
  * handle annotated {@link ClassRule}s, create a composite
  * {@link Description}, and run children sequentially.
